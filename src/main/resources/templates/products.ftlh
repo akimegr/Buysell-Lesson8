@@ -1,5 +1,13 @@
 <#import "blocks/template.ftlh" as t>
 <@t.template user>
+
+        <#if user.getId()??>
+            <h3 style="text-align: right">Ваш баланс: </h3>
+            <#if user.getDollars()??>user.getDollars()
+            <#else>
+                0
+            </#if>
+        </#if>
     <h1 style="text-align: center">Поиск товаров</h1><hr>
     <form method="get" action="/">
         <div class="form-row">
