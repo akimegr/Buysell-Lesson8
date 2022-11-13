@@ -28,9 +28,9 @@
                 <select id="searchCity" required name="city" class="form-control">
                     <option value="">Город не выбран</option>
 
-                    <option value="Минск">Москва</option>
-                    <option value="Витебск">Красноярск</option>
-                    <option value="Брест">Казань</option>
+                    <option value="Минск">Минск</option>
+                    <option value="Витебск">Витебск</option>
+                    <option value="Брест">Брест</option>
 
                 </select>
             </div>
@@ -55,6 +55,10 @@
                     <input type="file" name="file3" id="file3">
                     <label class="custom-file-label" for="file3">Третья фотография к товару</label>
                 </div>
+            </div>
+            <div class="form-group">
+                <label for="secretMessage">Секретный ключ</label>
+                <textarea required class="form-control" id="secretMessage" name="secretMessage"></textarea>
             </div>
             <input type="hidden" name="_csrf" value="${_csrf.token}"/>
 

@@ -41,15 +41,21 @@ public class ProductController {
 
     @GetMapping("/product/{id}")
     public String productInfo(@PathVariable Long id, Model model, Principal principal) {
+        User userNow = productService.getUserByPrincipal(principal);
         Product product = productService.getProductById(id);
-        model.addAttribute("user", productService.getUserByPrincipal(principal));
+        model.addAttribute("user", userNow);
         model.addAttribute("product", product);
         model.addAttribute("images", product.getImages());
         model.addAttribute("authorProduct", product.getUser());
-        String purchaseResult = productService.purchaseMessage(productService.getUserByPrincipal(principal), id, principal);
-        boolean canBuy = productService.canBuy(productService.getUserByPrincipal(principal), id);
+        String purchaseResult = productService.purchaseMessage(userNow, id, principal);
+        boolean canBuy = productService.canBuy(userNow, id);
         model.addAttribute("canBuy", !canBuy);
         model.addAttribute("resultPurchase", purchaseResult);
+        if(userNow.getId()!=null) {
+            if(userNow.getId().equals(product.getUser().getId())){
+                model.addAttribute("secretMessage", product.getSecretMessage());
+            }
+        }
         return "product-info";
     }
 

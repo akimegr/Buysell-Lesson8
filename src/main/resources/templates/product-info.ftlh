@@ -45,6 +45,9 @@
     <p><h1 style="text-align: center">${product.title} | ${product.price} ₽</h1></p>
     <p style="text-align: center">${product.description}</p>
     <p style="text-align: center">Номер телефона продавца: <b>${authorProduct.phoneNumber}</b></p>
+    <#if secretMessage??>
+        <p style="text-align: center">Ключ доступа: <b>${secretMessage}</b></p>
+    </#if>
     <form action="/buy/${product.id}" method="post">
         <input type="hidden" name="_csrf" value="${_csrf.token}"/>
         <button type="submit" style="text-align: center; width: 100%" class="btn btn-danger mb-2">

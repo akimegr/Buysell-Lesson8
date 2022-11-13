@@ -19,9 +19,14 @@
         <#list products as product>
             <a href="/product/${product.id}" class="product-link">
                 <div class="card text-white bg-dark my-3 product">
-
-                    <img src="/images/${product.previewImageId}"
+                    <#if product.previewImageId??>
+                        <img src="/images/${product.previewImageId}"
                          class="card-img-top">
+                        <#else>
+                            <img src="/static/images/avatar.png"
+                                 class="card-img-top">
+                    </#if>
+
                     <div class="card-body">
                         <h5 class="card-title">${product.title}</h5>
                         <p class="card-text">${product.price} ₽</p>
