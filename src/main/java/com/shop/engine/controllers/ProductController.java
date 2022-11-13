@@ -46,6 +46,10 @@ public class ProductController {
         model.addAttribute("product", product);
         model.addAttribute("images", product.getImages());
         model.addAttribute("authorProduct", product.getUser());
+        String purchaseResult = productService.purchaseMessage(productService.getUserByPrincipal(principal), id, principal);
+        boolean canBuy = productService.canBuy(productService.getUserByPrincipal(principal), id);
+        model.addAttribute("canBuy", !canBuy);
+        model.addAttribute("resultPurchase", purchaseResult);
         return "product-info";
     }
 
@@ -108,5 +112,31 @@ public class ProductController {
                                 .collect(Collectors.toList());
         model.addAttribute("products", productUser);
         return "my-products";
+    }
+
+    @PostMapping("/buy/{id}")
+    public String buyProduct(@PathVariable Long id, Principal principal, Model model){
+        User user = productService.getUserByPrincipal(principal);
+        boolean canBuy = productService.canBuy(user, id);
+        String purchaseResult = productService.purchaseMessage(user, id, principal);
+        if(!canBuy) {
+            model.addAttribute("canBuy", !canBuy);
+            model.addAttribute("resultPurchase", purchaseResult);
+            Product product = productService.getProductById(id);
+            model.addAttribute("user", productService.getUserByPrincipal(principal));
+            model.addAttribute("product", product);
+            model.addAttribute("images", product.getImages());
+            model.addAttribute("authorProduct", product.getUser());
+            return "product-info";
+        }
+        else {
+            productService.buyCar(user, id, principal);
+            model.addAttribute("canBuy", canBuy);
+            model.addAttribute("resultPurchase", purchaseResult);
+            model.addAttribute("products", productService.listProducts(null));
+            model.addAttribute("user", productService.getUserByPrincipal(principal));
+            model.addAttribute("searchWord", null);
+            return "products";
+        }
     }
 }

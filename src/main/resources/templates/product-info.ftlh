@@ -1,5 +1,10 @@
 <#import "blocks/template.ftlh" as t>
 <@t.template user>
+    <div>
+        <#if canBuy??>
+            <h1>${resultPurchase}</h1>
+        </#if>
+    </div>
     <div id="myCarousel" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
             <#list images as image>
@@ -40,6 +45,12 @@
     <p><h1 style="text-align: center">${product.title} | ${product.price} ₽</h1></p>
     <p style="text-align: center">${product.description}</p>
     <p style="text-align: center">Номер телефона продавца: <b>${authorProduct.phoneNumber}</b></p>
+    <form action="/buy/${product.id}" method="post">
+        <input type="hidden" name="_csrf" value="${_csrf.token}"/>
+        <button type="submit" style="text-align: center; width: 100%" class="btn btn-danger mb-2">
+            Купить
+        </button>
+    </form>
 
     <hr>
     <p style="text-align: center">

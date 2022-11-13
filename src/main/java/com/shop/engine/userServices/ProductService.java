@@ -1,5 +1,6 @@
 package com.shop.engine.userServices;
 
+import com.Localization.Localization;
 import com.shop.engine.models.FranchiseProduct;
 import com.shop.engine.models.Image;
 import com.shop.engine.models.Product;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -133,6 +135,49 @@ public class ProductService {
         } else {
             log.error("Product with id = {} is not found", id);
         }
+    }
+
+    public boolean canBuy(User user, Long id) {
+        Product product = productRepository.findById(id).orElse(null);
+        if(product.getPrice()<=user.getDollars()){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    public void buyCar(User user, Long id, Principal principal) {
+        Product product = productRepository.findById(id).orElse(null);
+        User ownerUser = userRepository.findById(product.getUser().getId()).get();
+        product.setUser(getUserByPrincipal(principal));
+        log.info("Saving new purchase. Title: {}; Author email: {}", product.getTitle(), product.getUser().getEmail());
+        Product productFromDb = productRepository.save(product);
+        productFromDb.setPreviewImageId(productFromDb.getImages().get(0).getId());
+        ownerUser.setDollars(ownerUser.getDollars()+product.getPrice());
+        user.setDollars(user.getDollars()-product.getPrice());
+        productRepository.save(product);
+        log.info("New balance. Balance owner: {}; Balance buyer : {}", ownerUser.getDollars(), user.getDollars());
+        userRepository.save(ownerUser);
+        userRepository.save(user);
+    }
+
+
+    public String purchaseMessage(User user, Long id, Principal principal) {
+        Product product = productRepository.findById(id).orElse(null);
+        String successfulBuying = Localization.productIsNotFound;
+        if (product != null) {
+            successfulBuying = Localization.productCannotBeFound;
+            if (user.getId() == null) {
+                successfulBuying = Localization.notAuthorizedForPurchase;
+            } else if (!user.getId().equals(product.getUser().getId())) {
+                successfulBuying = Localization.notEnoughMoney;
+                if (product.getPrice() <= user.getDollars()) {
+                    successfulBuying = Localization.canBuy;
+                }
+            }
+        }
+
+        return successfulBuying;
     }
 
 

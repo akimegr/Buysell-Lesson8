@@ -2,11 +2,15 @@
 <@t.template user>
 
         <#if user.getId()??>
-            <h3 style="text-align: right">Ваш баланс: </h3>
-            <#if user.getDollars()??>user.getDollars()
-            <#else>
-                0
-            </#if>
+            <div style="text-align: right">
+                <h3>Ваш баланс: </h3>
+                <#if user.getDollars()??>
+                    ${user.getDollars()}
+                <#else>
+                    0
+                </#if>
+            </div>
+
         </#if>
     <h1 style="text-align: center">Поиск товаров</h1><hr>
     <form method="get" action="/">
@@ -15,9 +19,9 @@
                 <label for="searchCity">Город</label>
                 <select id="searchCity" class="form-control">
                     <option value="">Город не выбран</option>
-                    <option value="Москва">Москва</option>
-                    <option value="Красноярск">Красноярск</option>
-                    <option value="Казань">Казань</option>
+                    <option value="Минск">Минск</option>
+                    <option value="Витебск">Витебск</option>
+                    <option value="Орша">Орша</option>
                 </select>
             </div>
             <div class="form-group col-md-10">

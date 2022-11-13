@@ -21,6 +21,15 @@
                 <span class="navbar-brand mb-0 h1">CARS</span>
             </a>
             <#if user.email??>
+                <div style="text-align: center">
+                    <h3>Ваш баланс: </h3>
+                    <#if user.getDollars()??>
+                        ${user.getDollars()}
+                    <#else>
+                        0
+                    </#if>
+                </div>
+
                 <div class="dropdown text-end">
                     <a href="/profile">
                         <img src="/static/images/avatar.png" alt="mdo"

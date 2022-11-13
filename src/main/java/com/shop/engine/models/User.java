@@ -166,6 +166,9 @@ public class User implements UserDetails {
     }
 
     public Double getDollars() {
+        if(dollars==null){
+            return 0.0;
+        }
         return dollars;
     }
 
