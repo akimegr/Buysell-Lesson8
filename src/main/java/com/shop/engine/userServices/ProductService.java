@@ -45,7 +45,7 @@ public class ProductService {
         String result = franchiseRepository.findById(id).isPresent() ?
                 franchiseRepository.findById(id).get().getTitle() : "CAN'T TAKE";
         log.info("Take product {}", result);
-        return franchiseRepository.findById(id).get();
+        return franchiseRepository.findById(id).orElse(null);
     }
 
     public void saveFranchiseToCatalog(FranchiseProduct franchiseProduct, Principal principal) {
