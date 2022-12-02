@@ -1,33 +1,23 @@
 package com.shop.engine;
 
-import com.shop.engine.models.FranchiseProduct;
 import com.shop.engine.models.PrincipalOpen;
 import com.shop.engine.models.Product;
 import com.shop.engine.models.User;
-import com.shop.engine.models.enums.Role;
 import com.shop.engine.repositories.UserRepository;
 import com.shop.engine.userServices.ProductService;
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,7 +35,7 @@ public class productApplicationTest {
 
     private Product product;
 
-    private PrincipalOpen principalExist;
+    private PrincipalOpen principalNewOwner;
 
     private PrincipalOpen principalNew;
 
@@ -54,7 +44,7 @@ public class productApplicationTest {
     public void setUp() {
         productServiceMockito = Mockito.mock(ProductService.class);
 
-        principalExist.setName("akim.egor2013@yandex.ru");
+        principalNewOwner.setName("akim.egor2013@yandex.ru");
 
         principalNew.setName("akimEgor@mail.ru");
 
@@ -165,12 +155,12 @@ public class productApplicationTest {
 
             }
         };
-        principalExist = new PrincipalOpen();
+        principalNewOwner = new PrincipalOpen();
         principalNew = new PrincipalOpen();
-        principalExist.setName("akim.egor2013@mail.ru");
+        principalNewOwner.setName("akim.egor2013@mail.ru");
 
         principalNew.setName("akimEgor@mail.ru");
-        productService.saveProduct(principalExist, product, multipartFile,multipartFile,multipartFile);
+        productService.saveProduct(principalNewOwner, product, multipartFile,multipartFile,multipartFile);
         Product checkProduct = productService.getProductById(product.getId());
         Assertions.assertNotNull(checkProduct);
         Assertions.assertEquals("Минск", checkProduct.getCity());
@@ -199,6 +189,42 @@ public class productApplicationTest {
         testForBuy.setDollars(product.getPrice()+10.3);
         boolean canBuy = productService.canBuy(testForBuy, product.getId());
         Assertions.assertTrue(canBuy);
+    }
+
+    @Test
+    public void buyCarTest() {
+        product = productService.getProductById(22l);
+        User ownerUser = userRepository.findById(product.getUser().getId()).get();
+        User customerUser = userRepository.findById(1l).get();
+        principalNewOwner = new PrincipalOpen();
+        principalNewOwner.setName(customerUser.getEmail());
+        PrincipalOpen principalOldOwner = new PrincipalOpen();
+        principalOldOwner.setName(ownerUser.getEmail());
+        Double moneyNewOwner = customerUser.getDollars();
+        Double moneyOldOwner = ownerUser.getDollars();
+        int productPrice = product.getPrice();
+        productService.buyCar(customerUser, 22l, principalNewOwner);
+        product = productService.getProductById(22l);
+        Double newMoneyNewOwner = userRepository.findById(customerUser.getId()).get().getDollars();
+        Double newMoneyOldOwner = userRepository.findById(ownerUser.getId()).get().getDollars();
+        Assertions.assertEquals(newMoneyNewOwner,moneyNewOwner - productPrice, 5);
+        Assertions.assertEquals(newMoneyOldOwner,moneyOldOwner + productPrice, 5);
+        productService.buyCar(ownerUser, 22l, principalOldOwner);
+        User userForRevertSumFirstOwner = userRepository.findById(3l).get();
+        User userForRevertSumSecondOwner = userRepository.findById(1l).get();
+        userForRevertSumFirstOwner.setDollars(userForRevertSumFirstOwner.getDollars()+productPrice);
+        userForRevertSumSecondOwner.setDollars(userForRevertSumSecondOwner.getDollars()+productPrice);
+        userRepository.save(userForRevertSumFirstOwner);
+        userRepository.save(userForRevertSumSecondOwner);
+        User ownerUser2 = userRepository.findById(3l).get();
+        User customerUser2 = userRepository.findById(1l).get();
+
+        Double checkOldCustomerMoney = customerUser2.getDollars();
+        Double checkOldOwnerMoney = ownerUser2.getDollars();
+
+        Assertions.assertEquals(checkOldOwnerMoney,moneyOldOwner, 5);
+        Assertions.assertEquals(checkOldCustomerMoney,moneyNewOwner , 5);
+
     }
 
 

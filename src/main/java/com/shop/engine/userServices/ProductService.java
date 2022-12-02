@@ -153,7 +153,8 @@ public class ProductService {
         product.setUser(getUserByPrincipal(principal));
         log.info("Saving new purchase. Title: {}; Author email: {}", product.getTitle(), product.getUser().getEmail());
         Product productFromDb = productRepository.save(product);
-        productFromDb.setPreviewImageId(productFromDb.getImages().get(0).getId());
+        if(productFromDb.getImages().size()>0)
+            productFromDb.setPreviewImageId(productFromDb.getImages().get(0).getId());
         ownerUser.setDollars(ownerUser.getDollars()+product.getPrice());
         user.setDollars(user.getDollars()-product.getPrice());
         productRepository.save(product);
